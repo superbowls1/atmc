@@ -1,0 +1,120 @@
+#include <stdio.h>
+
+// Joey Slepski 9/14: Added functions instead of inlining in the do-while case
+
+// Function to check balance
+void check_balance(float balance) {
+    printf("Your balance is $%.2f\n", balance);
+}
+
+// Function to withdraw cash
+float withdraw_cash(float balance, float withdrawlimit, float *sessionw) {
+    float withdraw;
+    printf("Enter amount to withdraw (multiple of 20): ");
+    scanf("%f", &withdraw);
+    
+    if (withdraw <= 0) {
+        printf("Invalid amount\n");
+        return -1;
+    } else if (withdraw > balance) {
+        printf("Not enough funds\n");
+    } else if (withdraw > (withdrawlimit - *sessionw)) {
+        printf("Withdraw limit exceeded\n");
+    } else if ((int)withdraw % 20 != 0) {
+        printf("Amount must be a multiple of 20\n");
+    } else {
+        balance -= withdraw;
+        *sessionw += withdraw;
+        printf("You withdrew $%.2f. Your new balance is $%.2f\n", withdraw, balance);
+        return balance;
+    }
+    
+    return -1;
+}
+
+// Function to deposit cash
+float deposit_cash(float balance, float depositlimit) {
+    float deposit;
+    printf("Enter amount to deposit: ");
+    scanf("%f", &deposit);
+    
+    if (deposit <= 0) {
+        printf("Must deposit more than 0\n");
+        return -1;
+    } else if (deposit > depositlimit) {
+        printf("Deposit limit exceeded\n");
+    } else {
+        balance += deposit;
+        printf("You deposited $%.2f. Your new balance is $%.2f\n", deposit, balance);
+        return balance;
+    }
+    
+    return -1;
+}
+
+int main() {
+    float balance = 5000;
+    float sessionw = 0;
+    int max = 3;
+    int pin = 3014;
+    int enter = 0;
+    int count = 0;
+    int choice = 0;
+    int transactions = 0;
+    const float depositlimit = 10000;
+    const float withdrawlimit = 1000;
+    
+    while (count < max) {
+        printf("Enter 4-digit PIN: ");
+        scanf("%d", &enter);
+        
+        if (enter == pin) {
+            do {
+                printf("======================\n");
+                printf("1. Check Balance\n");
+                printf("2. Withdraw cash (multiple of $20)\n");
+                printf("3. Deposit cash\n");
+                printf("4. Quit\n");
+                printf("======================\n");
+                printf("Enter your choice: ");
+                scanf("%d", &choice);
+                
+                switch (choice) {//cases based on what they picked
+                    case 1:
+                        check_balance(balance);
+                        transactions++;
+                        break;
+                    case 2:
+                        balance = withdraw_cash(balance, withdrawlimit, &sessionw);
+                        if (balance >= 0) {
+                            transactions++;
+                        }
+                        break;
+                    case 3:
+                        balance = deposit_cash(balance, depositlimit);
+                        if (balance >= 0) {
+                            transactions++;
+                        }
+                        break;
+                    case 4:
+                        printf("Exiting ATM. Final balance: $%.2f\n", balance);
+                        printf("Total Transactions: %d\n", transactions);
+                        break;
+                    default:
+                        printf("Invalid choice, try again.\n");
+                }
+            } while (choice != 4);
+            
+            return 0; 
+        } else {
+            count++;
+            if (count < max) {
+                printf("Incorrect PIN, try again.\n");
+            } else {
+                printf("Too many attempts. Exiting.\n");
+            }
+        }
+    }
+
+    return 0;
+}
